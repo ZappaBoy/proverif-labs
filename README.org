@@ -145,3 +145,5 @@ Nella seconda istanza ciò non accade dato che si aggiunge come ulteriore forma 
 #+BEGIN_SRC
 c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
 #+END_SRC
+
+* Esercizio 2
