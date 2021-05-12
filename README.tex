@@ -1,4 +1,4 @@
-% Created 2021-05-12 Wed 10:57
+% Created 2021-05-12 Wed 11:10
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -32,9 +32,49 @@
 
 
 \section{Esercizio 1}
-\label{sec:orgcc617c2}
+\label{sec:org1359874}
 \subsection{Denning-sacco}
-\label{sec:orgeec6547}
+\label{sec:org526c28b}
+\subsubsection{File Horn}
+\label{sec:orgf4f8e18}
+\begin{verbatim}
+pred c/1 elimVar,decompData.
+nounif c:x.
+
+fun pk/1.
+fun encrypt/2.
+
+fun sign/2.
+
+query c:secret[].
+
+reduc
+(* Initialization *)
+
+c:c[];
+c:pk(sA[]);
+c:pk(sB[]);
+
+(* The attacker *)
+
+c:x & c:encrypt(m,pk(x)) -> c:m;
+c:x -> c:pk(x);
+c:x & c:y -> c:encrypt(x,y);
+c:sign(x,y) -> c:x;
+c:x & c:y -> c:sign(x,y);
+
+(* The protocol *)
+(* A *)
+
+c:pk(x) -> c:encrypt(sign(k[pk(x)], sA[]), pk(x));
+
+(* B *)
+
+c:encrypt(sign(k, sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
+\end{verbatim}
+
+\subsubsection{Output}
+\label{sec:org866ac15}
 \begin{verbatim}
 Initial clauses:
 Clause 11: c:c[]
@@ -68,7 +108,46 @@ clause 8 c:secret[]
 RESULT goal reachable: c:secret[]
 \end{verbatim}
 \subsection{Denning-sacco corretto}
-\label{sec:org4efa377}
+\label{sec:orgc496478}
+\subsubsection{File Horn}
+\label{sec:orgf160621}
+\begin{verbatim}
+pred c/1 elimVar,decompData.
+nounif c:x.
+
+fun pk/1.
+fun encrypt/2.
+
+fun sign/2.
+
+query c:secret[].
+
+reduc
+(* Initialization *)
+
+c:c[];
+c:pk(sA[]);
+c:pk(sB[]);
+
+(* The attacker *)
+
+c:x & c:encrypt(m,pk(x)) -> c:m;
+c:x -> c:pk(x);
+c:x & c:y -> c:encrypt(x,y);
+c:sign(x,y) -> c:x;
+c:x & c:y -> c:sign(x,y);
+
+(* The protocol *)
+(* A *)
+
+c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
+
+(* B *)
+
+c:encrypt(sign((pk(sA[]), pk(sB[]), k), sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
+\end{verbatim}
+\subsubsection{Output}
+\label{sec:orgb95c92c}
 \begin{verbatim}
 Initial clauses:
 Clause 15: c:(v,v_1,v_2) -> c:v_2
@@ -89,4 +168,7 @@ Clause 1: c:new-name[!att = v]
 Completing...
 RESULT goal unreachable: c:secret[]
 \end{verbatim}
+\subsection{Conclusione}
+\label{sec:org64be261}
+Dall'output delle due istanze si nota sin da subito che solo nel primo caso \emph{proverif} riesce a raggiungere lo stato \emph{secret[]} e quindi rilevare un errore. Ciò
 \end{document}
