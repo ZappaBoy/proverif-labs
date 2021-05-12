@@ -1,16 +1,41 @@
-#+TITLE: Readme
-#+AUTHOR: [[mailto:f.zappone1@studenti.unimol.it][Albanese Daniele, Marco Russodivito e Federico Zappone]]
-#+DATE: 2021-05-12 Wed
-#+EMAIL: f.zappone1@studenti.unimol.it
-#+SUBTITLE:
-#+DESCRIPTION:
-#+KEYWORDS:
-#+TEXT:
-#+LATEX_HEADER: \hypersetup{hidelinks}
+% Created 2021-05-12 Wed 10:57
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\author{\href{mailto:f.zappone1@studenti.unimol.it}{Albanese Daniele, Marco Russodivito e Federico Zappone}}
+\date{2021-05-12 Wed}
+\title{Readme}
+\hypersetup{
+ pdfauthor={\href{mailto:f.zappone1@studenti.unimol.it}{Albanese Daniele, Marco Russodivito e Federico Zappone}},
+ pdftitle={Readme},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 27.2 (Org mode 9.5)}, 
+ pdflang={English}}
+\begin{document}
 
-* Esercizio 1
-** Denning-sacco
-#+BEGIN_SRC shell
+\maketitle
+\tableofcontents
+
+
+\section{Esercizio 1}
+\label{sec:orgcc617c2}
+\subsection{Denning-sacco}
+\label{sec:orgeec6547}
+\begin{verbatim}
 Initial clauses:
 Clause 11: c:c[]
 Clause 10: c:pk(sA[])
@@ -41,9 +66,10 @@ clause 8 c:secret[]
                         any c:x
             clause 9 c:pk(sB[])
 RESULT goal reachable: c:secret[]
-#+END_SRC
-** Denning-sacco corretto
-#+BEGIN_SRC shell
+\end{verbatim}
+\subsection{Denning-sacco corretto}
+\label{sec:org4efa377}
+\begin{verbatim}
 Initial clauses:
 Clause 15: c:(v,v_1,v_2) -> c:v_2
 Clause 14: c:(v,v_1,v_2) -> c:v_1
@@ -62,4 +88,5 @@ Clause 2: c:encrypt(sign((pk(sA[]),pk(sB[]),k_1),sA[]),pk(sB[])) -> c:encrypt(se
 Clause 1: c:new-name[!att = v]
 Completing...
 RESULT goal unreachable: c:secret[]
-#+END_SRC
+\end{verbatim}
+\end{document}
