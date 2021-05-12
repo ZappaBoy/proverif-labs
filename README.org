@@ -139,4 +139,9 @@ Completing...
 RESULT goal unreachable: c:secret[]
 #+END_SRC
 ** Conclusione
-Dall'output delle due istanze si nota sin da subito che solo nel primo caso /proverif/ riesce a raggiungere lo stato /secret[]/ e quindi rilevare un errore. Ciò
+Dall'output delle due istanze si nota sin da subito che solo nel primo caso /proverif/ riesce a raggiungere lo stato /secret[]/ e quindi rilevare un errore.
+Ciò è possibile dato che nella prima istanza si assume che l'attaccante non arrivi mai a conoscenza di una chiave di sessione. Ciò rende infatti il protocollo vulnerabile al /replay attack/, in quanto, se l'attaccante entra in possesso di una chiave di sessione potrà cifrare un nuovo messaggio che sarà accettato dalla vittima.
+Nella seconda istanza ciò non accade dato che si aggiunge come ulteriore forma di sicurezza un /nonce/ modellato da *pk(sA[]), pk(x)* nella riga:
+#+BEGIN_SRC
+c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
+#+END_SRC

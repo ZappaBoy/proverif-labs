@@ -1,28 +1,28 @@
 
 # Table of Contents
 
-1.  [Esercizio 1](#orgb86bf75)
-    1.  [Denning-sacco](#org6d1d738)
-        1.  [File Horn](#org2fac457)
-        2.  [Output](#orgaa341fc)
-    2.  [Denning-sacco corretto](#org36a7660)
-        1.  [File Horn](#org249fd11)
-        2.  [Output](#orgda9659b)
-    3.  [Conclusione](#orgf888ef7)
+1.  [Esercizio 1](#org06fb5f3)
+    1.  [Denning-sacco](#org33c58d7)
+        1.  [File Horn](#orgaae429e)
+        2.  [Output](#org758db24)
+    2.  [Denning-sacco corretto](#orgdf97ccf)
+        1.  [File Horn](#org850c6ba)
+        2.  [Output](#org264a1b8)
+    3.  [Conclusione](#orgd604555)
 
 
 
-<a id="orgb86bf75"></a>
+<a id="org06fb5f3"></a>
 
 # Esercizio 1
 
 
-<a id="org6d1d738"></a>
+<a id="org33c58d7"></a>
 
 ## Denning-sacco
 
 
-<a id="org2fac457"></a>
+<a id="orgaae429e"></a>
 
 ### File Horn
 
@@ -61,7 +61,7 @@
     c:encrypt(sign(k, sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
 
 
-<a id="orgaa341fc"></a>
+<a id="org758db24"></a>
 
 ### Output
 
@@ -97,12 +97,12 @@
     RESULT goal reachable: c:secret[]
 
 
-<a id="org36a7660"></a>
+<a id="orgdf97ccf"></a>
 
 ## Denning-sacco corretto
 
 
-<a id="org249fd11"></a>
+<a id="org850c6ba"></a>
 
 ### File Horn
 
@@ -141,7 +141,7 @@
     c:encrypt(sign((pk(sA[]), pk(sB[]), k), sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
 
 
-<a id="orgda9659b"></a>
+<a id="org264a1b8"></a>
 
 ### Output
 
@@ -165,9 +165,13 @@
     RESULT goal unreachable: c:secret[]
 
 
-<a id="orgf888ef7"></a>
+<a id="orgd604555"></a>
 
 ## Conclusione
 
-Dall&rsquo;output delle due istanze si nota sin da subito che solo nel primo caso *proverif* riesce a raggiungere lo stato *secret[]* e quindi rilevare un errore. Ciò
+Dall&rsquo;output delle due istanze si nota sin da subito che solo nel primo caso *proverif* riesce a raggiungere lo stato *secret[]* e quindi rilevare un errore.
+Ciò è possibile dato che nella prima istanza si assume che l&rsquo;attaccante non arrivi mai a conoscenza di una chiave di sessione. Ciò rende infatti il protocollo vulnerabile al *replay attack*, in quanto, se l&rsquo;attaccante entra in possesso di una chiave di sessione potrà cifrare un nuovo messaggio che sarà accettato dalla vittima.
+Nella seconda istanza ciò non accade dato che si aggiunge come ulteriore forma di sicurezza un *nonce* modellato da **pk(sA[]), pk(x)** nella riga:
+
+    c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
 

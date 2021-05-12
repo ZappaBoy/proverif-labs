@@ -1,4 +1,4 @@
-% Created 2021-05-12 Wed 11:10
+% Created 2021-05-12 Wed 11:34
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -32,11 +32,11 @@
 
 
 \section{Esercizio 1}
-\label{sec:org1359874}
+\label{sec:org371d8a6}
 \subsection{Denning-sacco}
-\label{sec:org526c28b}
+\label{sec:org361b5f5}
 \subsubsection{File Horn}
-\label{sec:orgf4f8e18}
+\label{sec:orgc7aebae}
 \begin{verbatim}
 pred c/1 elimVar,decompData.
 nounif c:x.
@@ -74,7 +74,7 @@ c:encrypt(sign(k, sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
 \end{verbatim}
 
 \subsubsection{Output}
-\label{sec:org866ac15}
+\label{sec:org7daf5ef}
 \begin{verbatim}
 Initial clauses:
 Clause 11: c:c[]
@@ -108,9 +108,9 @@ clause 8 c:secret[]
 RESULT goal reachable: c:secret[]
 \end{verbatim}
 \subsection{Denning-sacco corretto}
-\label{sec:orgc496478}
+\label{sec:orgd4e2c4a}
 \subsubsection{File Horn}
-\label{sec:orgf160621}
+\label{sec:org86ecd58}
 \begin{verbatim}
 pred c/1 elimVar,decompData.
 nounif c:x.
@@ -147,7 +147,7 @@ c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
 c:encrypt(sign((pk(sA[]), pk(sB[]), k), sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
 \end{verbatim}
 \subsubsection{Output}
-\label{sec:orgb95c92c}
+\label{sec:orga1a464d}
 \begin{verbatim}
 Initial clauses:
 Clause 15: c:(v,v_1,v_2) -> c:v_2
@@ -169,6 +169,11 @@ Completing...
 RESULT goal unreachable: c:secret[]
 \end{verbatim}
 \subsection{Conclusione}
-\label{sec:org64be261}
-Dall'output delle due istanze si nota sin da subito che solo nel primo caso \emph{proverif} riesce a raggiungere lo stato \emph{secret[]} e quindi rilevare un errore. Ciò
+\label{sec:orgd208fca}
+Dall'output delle due istanze si nota sin da subito che solo nel primo caso \emph{proverif} riesce a raggiungere lo stato \emph{secret[]} e quindi rilevare un errore.
+Ciò è possibile dato che nella prima istanza si assume che l'attaccante non arrivi mai a conoscenza di una chiave di sessione. Ciò rende infatti il protocollo vulnerabile al \emph{replay attack}, in quanto, se l'attaccante entra in possesso di una chiave di sessione potrà cifrare un nuovo messaggio che sarà accettato dalla vittima.
+Nella seconda istanza ciò non accade dato che si aggiunge come ulteriore forma di sicurezza un \emph{nonce} modellato da \textbf{pk(sA[]), pk(x)} nella riga:
+\begin{verbatim}
+c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
+\end{verbatim}
 \end{document}
