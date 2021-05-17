@@ -29,9 +29,14 @@ pred c/1 elimVar,decompData.
 nounif c:x.
 
 fun pk/1.
+<<<<<<< Updated upstream
 fun pencrypt/2.
 
 fun sign/2.
+=======
+fun aencrypt/2.
+fun sencrypt/2.
+>>>>>>> Stashed changes
 
 query c:secret[].
 
@@ -40,10 +45,11 @@ reduc
 
 c:c[];
 c:pk(sA[]);
-c:pk(sB[]);
+c:pk(sB[]); 						(*(1) il cancale conosce l'identità di B *)
 
 (* The attacker *)
 
+<<<<<<< Updated upstream
 c:x & c:pencrypt(m,pk(x)) -> c:m;
 c:x -> c:pk(x);
 c:x & c:y -> c:pencrypt(x,y);
@@ -57,6 +63,19 @@ c:k[] & c:pk(x) -> c:pencrypt(k[], pk(x));
 
 (* B *)
 c:k[] & c:pk(x) & c:pencrypt(k[], pk(x)) -> c:pencrypt(secret[], pk(k)).
+=======
+c:x & c:aencrypt(m,pk(x)) -> c:m;
+c:x & c:sencrypt(m,x) -> c:m; 		(*(4) l'attaccante riceve secret[] *)
+c:x -> c:pk(x);
+c:x & c:y -> c:aencrypt(x,y); 		(*(2) l'attaccante usa aencrypt(k, pk(sB[])) per inviare una chiave di cifratura fingendosi A *)
+
+(* The protocol *)
+(* A *)
+c:k[] & c:pk(x) -> c:aencrypt(k[], pk(x));
+
+(* B *)
+c:aencrypt(k, pk(sB[])) -> c:sencrypt(secret[], k). (*(3) B riceve la chiave dall'attaccante e risponde con il secret[] cifrato *)
+>>>>>>> Stashed changes
 
 (* EXPECTPV
 RESULT goal reachable: c:secret[]
