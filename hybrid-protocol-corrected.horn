@@ -56,7 +56,7 @@ c:x & c:y -> c:sign(x,y);
 
 (* The protocol *)
 (* A *)
-c:pk(x) -> c:pencrypt((secret[], sign(secret[], sA[])), pk(x));
+c:pk(x) -> c:pencrypt((k[pk(x)], sign(k[pk(x)], sA[])), pk(x));
 
 (* B *)
-c:pencrypt((secret[], sign(secret[], sA[])), pk(sA[])) -> c:sencrypt(secret[], m[]).
+c:pencrypt((k, sign(k, sA[])), pk(sB[])) -> c:sencrypt(k, secret[]).
