@@ -59,4 +59,4 @@ c:x & c:y -> c:sign(x,y);
 c:pk(x) -> c:pencrypt((k[pk(x)], sign(k[pk(x)], sA[])), pk(x));
 
 (* B *)
-c:pencrypt((k, sign(k, sA[])), pk(sB[])) -> c:sencrypt(k, secret[]).
+c:pencrypt((k[pk(sB[])], sign(k[pk(sB[])], sA[])), pk(sB[])) -> c:sencrypt(secret[], k[pk(sB[])]).
