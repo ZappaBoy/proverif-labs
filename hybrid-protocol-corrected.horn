@@ -2,7 +2,7 @@ pred c/1 elimVar,decompData.
 nounif c:x.
 
 fun pk/1.
-fun pencrypt/2.
+fun aencrypt/2.
 fun sencrypt/2.
 fun sign/2.
 
@@ -18,19 +18,19 @@ c:pk(sB[]);
 
 (* The attacker *)
 
-c:x & c:pencrypt(m,pk(x)) -> c:m;
+c:x & c:aencrypt(m,pk(x)) -> c:m;
 c:x & c:sencrypt(m,x) -> c:m; 
 c:x -> c:pk(x);
-c:x & c:y -> c:pencrypt(x,y); 
+c:x & c:y -> c:aencrypt(x,y); 
 c:sign(x,y) -> c:x; (*se vedo una firma, vedo il contenuto*)
 c:x & c:y -> c:sign(x,y); (*Se ho il messaggio e la chiave privata posso firmare*)
 
 (* The protocol *)
 (* A *)
-c:k[] & c:pk(x) & c:sA[] -> c:pencrypt(sign(k[], sA[]), pk(x));
+c:k[] & c:pk(x) & c:sA[] -> c:aencrypt(sign(k[], sA[]), pk(x));
 
 (* B *)
-c:pencrypt(sign(k[], sA[]), pk(sB[])) -> c:sencrypt(secret[], k).
+c:aencrypt(sign(k[], sA[]), pk(sB[])) -> c:sencrypt(secret[], k).
 
 (* EXPECTPV
 RESULT goal reachable: c:secret[]
