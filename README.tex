@@ -1,4 +1,4 @@
-% Created 2021-05-12 Wed 11:34
+% Created 2021-05-19 Wed 11:37
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -32,11 +32,11 @@
 
 
 \section{Esercizio 1}
-\label{sec:org371d8a6}
+\label{sec:orgb1a6f2c}
 \subsection{Denning-sacco}
-\label{sec:org361b5f5}
+\label{sec:orge25ee4b}
 \subsubsection{File Horn}
-\label{sec:orgc7aebae}
+\label{sec:org0eea914}
 \begin{verbatim}
 pred c/1 elimVar,decompData.
 nounif c:x.
@@ -73,9 +73,10 @@ c:pk(x) -> c:encrypt(sign(k[pk(x)], sA[]), pk(x));
 c:encrypt(sign(k, sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
 \end{verbatim}
 
-\subsubsection{Output}
-\label{sec:org7daf5ef}
+\subsubsection{Proverif Output}
+\label{sec:orgb3d2a3d}
 \begin{verbatim}
+$ proverif denning-sacco.horn
 Initial clauses:
 Clause 11: c:c[]
 Clause 10: c:pk(sA[])
@@ -86,7 +87,8 @@ Clause 6: c:x & c:y -> c:encrypt(x,y)
 Clause 5: c:sign(x,y) -> c:x
 Clause 4: c:x & c:y -> c:sign(x,y)
 Clause 3: c:pk(x) -> c:encrypt(sign(k[pk(x)],sA[]),pk(x))
-Clause 2: c:encrypt(sign(k_1,sA[]),pk(sB[])) -> c:encrypt(secret[],pk(k_1))
+Clause 2: c:encrypt(sign(k_1,sA[]),pk(sB[]))
+              -> c:encrypt(secret[],pk(k_1))
 Clause 1: c:new-name[!att = v]
 Completing...
 goal reachable: c:secret[]
@@ -108,9 +110,9 @@ clause 8 c:secret[]
 RESULT goal reachable: c:secret[]
 \end{verbatim}
 \subsection{Denning-sacco corretto}
-\label{sec:orgd4e2c4a}
+\label{sec:orga886a31}
 \subsubsection{File Horn}
-\label{sec:org86ecd58}
+\label{sec:orgb1bf940}
 \begin{verbatim}
 pred c/1 elimVar,decompData.
 nounif c:x.
@@ -144,11 +146,14 @@ c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
 
 (* B *)
 
-c:encrypt(sign((pk(sA[]), pk(sB[]), k), sA[]), pk(sB[])) -> c:encrypt(secret[], pk(k)).
+c:encrypt(sign((pk(sA[]), pk(sB[]), k), sA[]), pk(sB[]))
+    -> c:encrypt(secret[], pk(k)).
 \end{verbatim}
-\subsubsection{Output}
-\label{sec:orga1a464d}
+
+\subsubsection{Proverif Output}
+\label{sec:org2256546}
 \begin{verbatim}
+$ proverif denning-sacco-corrected.horn
 Initial clauses:
 Clause 15: c:(v,v_1,v_2) -> c:v_2
 Clause 14: c:(v,v_1,v_2) -> c:v_1
@@ -163,17 +168,242 @@ Clause 6: c:x & c:y -> c:encrypt(x,y)
 Clause 5: c:sign(x,y) -> c:x
 Clause 4: c:x & c:y -> c:sign(x,y)
 Clause 3: c:pk(x) -> c:encrypt(sign((pk(sA[]),pk(x),k[pk(x)]),sA[]),pk(x))
-Clause 2: c:encrypt(sign((pk(sA[]),pk(sB[]),k_1),sA[]),pk(sB[])) -> c:encrypt(secret[],pk(k_1))
+Clause 2: c:encrypt(sign((pk(sA[]),pk(sB[]),k_1),sA[]),pk(sB[]))
+              -> c:encrypt(secret[],pk(k_1))
 Clause 1: c:new-name[!att = v]
 Completing...
 RESULT goal unreachable: c:secret[]
 \end{verbatim}
-\subsection{Conclusione}
-\label{sec:orgd208fca}
-Dall'output delle due istanze si nota sin da subito che solo nel primo caso \emph{proverif} riesce a raggiungere lo stato \emph{secret[]} e quindi rilevare un errore.
+
+\subsection{Risultati}
+\label{sec:orgb5dae2d}
+Dall'output delle due istanze si nota sin da subito che solo nel primo caso l'attaccante riesce ad ottenere \emph{secret[]} e quindi \emph{proverif} rileva un errore.
 Ciò è possibile dato che nella prima istanza si assume che l'attaccante non arrivi mai a conoscenza di una chiave di sessione. Ciò rende infatti il protocollo vulnerabile al \emph{replay attack}, in quanto, se l'attaccante entra in possesso di una chiave di sessione potrà cifrare un nuovo messaggio che sarà accettato dalla vittima.
-Nella seconda istanza ciò non accade dato che si aggiunge come ulteriore forma di sicurezza un \emph{nonce} modellato da \textbf{pk(sA[]), pk(x)} nella riga:
+Nella seconda istanza ciò non accade dato che è presente come ulteriore forma di sicurezza una \emph{signature} del messaggio scambiato durante la cifratura:
+
+\begin{center}
 \begin{verbatim}
 c:pk(x) -> c:encrypt(sign((pk(sA[]), pk(x), k[pk(x)]), sA[]), pk(x));
 \end{verbatim}
+\end{center}
+
+\section{Esercizio 2}
+\label{sec:orgd8a2367}
+\subsection{Hybrid Protocol}
+\label{sec:org2a9580d}
+\subsubsection{File Horn}
+\label{sec:orga428347}
+\begin{verbatim}
+pred c/1 elimVar,decompData.
+nounif c:x.
+
+fun pk/1.
+fun sencrypt/2.
+fun pencrypt/2.
+
+query c:secret[].
+
+reduc
+(* Initialization *)
+c:c[];
+c:pk(sA[]);
+c:pk(sB[]);
+
+
+(* The attacker *)
+c:x -> c:pk(x);
+
+c:x & c:pencrypt(m,pk(x)) -> c:m;
+c:x & c:y -> c:pencrypt(x,y);
+
+c:k & c:m -> c:sencrypt(m,k);
+c:k & c:sencrypt(m,k) -> c:m;
+
+
+(* The protocol *)
+(* A *)
+c:pk(x) -> c:pencrypt(secret[], pk(x));
+
+(* B *)
+c:pencrypt(secret[], pk(sA[])) -> c:sencrypt(secret[], m[]).
+\end{verbatim}
+
+\subsubsection{Proverif Output}
+\label{sec:org58bfab4}
+\begin{verbatim}
+$ proverif hybrid-protocol.horn
+Initial clauses:
+Clause 11: c:c[]
+Clause 10: c:pk(sA[])
+Clause 9: c:pk(sB[])
+Clause 8: c:x -> c:pk(x)
+Clause 7: c:x & c:pencrypt(m_1,pk(x)) -> c:m_1
+Clause 6: c:x & c:y -> c:pencrypt(x,y)
+Clause 5: c:k & c:m_1 -> c:sencrypt(m_1,k)
+Clause 4: c:k & c:sencrypt(m_1,k) -> c:m_1
+Clause 3: c:pk(x) -> c:pencrypt(secret[],pk(x))
+Clause 2: c:pencrypt(secret[],pk(sA[])) -> c:sencrypt(secret[],m[])
+Clause 1: c:new-name[!att = v]
+Completing...
+goal reachable: c:secret[]
+
+Derivation:
+clause 7 c:secret[]
+    duplicate c:x
+    clause 3 c:pencrypt(secret[],pk(x))
+        clause 8 c:pk(x)
+            any c:x
+
+RESULT goal reachable: c:secret[]
+\end{verbatim}
+\subsection{Hybrid Protocol Corrected}
+\label{sec:org768e539}
+\subsubsection{File horn}
+\label{sec:orgaeacb24}
+\begin{verbatim}
+pred c/1 elimVar,decompData.
+nounif c:x.
+
+fun pk/1.
+fun sencrypt/2.
+fun pencrypt/2.
+fun sign/2.
+
+query c:secret[]. (* shared key not found *)
+
+reduc
+(* Initialization *)
+c:c[];
+c:pk(sA[]);
+c:pk(sB[]);
+
+
+(* The attacker *)
+c:x -> c:pk(x);
+
+c:x & c:pencrypt(m,pk(x)) -> c:m;
+c:x & c:y -> c:pencrypt(x,y);
+
+c:k & c:m -> c:sencrypt(m,k);
+c:k & c:sencrypt(m,k) -> c:m;
+
+c:sign(x,y) -> c:x;
+c:x & c:y -> c:sign(x,y);
+
+(* The protocol *)
+(* A *)
+c:pk(x) -> c:pencrypt((k[pk(x)], sign(k[pk(x)], sA[])), pk(x));
+
+(* B *)
+c:pencrypt((k[pk(sB[])], sign(k[pk(sB[])], sA[])), pk(sB[]))
+    -> c:sencrypt(secret[], k[pk(sB[])]).
+\end{verbatim}
+
+\subsubsection{Proverif Output}
+\label{sec:org25abe7c}
+\begin{verbatim}
+$ proverif hybrid-protocol-corrected.horn
+Initial clauses:
+Clause 16: c:(v,v_1) -> c:v_1
+Clause 15: c:(v,v_1) -> c:v
+Clause 14: c:v & c:v_1 -> c:(v,v_1)
+Clause 13: c:c[]
+Clause 12: c:pk(sA[])
+Clause 11: c:pk(sB[])
+Clause 10: c:x -> c:pk(x)
+Clause 9: c:x & c:pencrypt(m,pk(x)) -> c:m
+Clause 8: c:x & c:y -> c:pencrypt(x,y)
+Clause 7: c:k_1 & c:m -> c:sencrypt(m,k_1)
+Clause 6: c:k_1 & c:sencrypt(m,k_1) -> c:m
+Clause 5: c:sign(x,y) -> c:x
+Clause 4: c:x & c:y -> c:sign(x,y)
+Clause 3: c:pk(x) -> c:pencrypt((k[pk(x)],sign(k[pk(x)],sA[])),pk(x))
+Clause 2: c:pencrypt((k[pk(sB[])],sign(k[pk(sB[])],sA[])),pk(sB[]))
+              -> c:sencrypt(secret[],k[pk(sB[])])
+Clause 1: c:new-name[!att = v]
+Completing...
+RESULT goal unreachable: c:secret[]
+\end{verbatim}
+
+\subsubsection{Risultati}
+\label{sec:orgc8e2e10}
+Il protocollo ibrido proposto nel secondo esercizio non risulta essere sicuro in quanto non vi è alcuna forma di integrità durante lo scambio dei messaggi, in particolare della chiave condivisa. Ciò porta l'attaccante a poter eseguire un attacco al protocollo. Per ovviare a questo problema si è inserita una \emph{signature} della chiave scambiata che ne certifica l'integrità.
+\subsection{False alarm protocol}
+\label{sec:org424a29e}
+\subsubsection{File horn}
+\label{sec:org51bc49f}
+\begin{verbatim}
+pred c/1 elimVar,decompData.
+nounif c:x.
+
+fun pk/1.
+fun pencrypt/2.
+
+query c:secret[].
+
+reduc
+(* Initialization *)
+
+c:c[];
+c:pk(sA[]);
+c:pk(sB[]);
+
+(* The attacker *)
+c:x -> c:pk(x);
+
+c:x & c:pencrypt(m,pk(x)) -> c:m;
+c:x & c:m -> c:pencrypt(x,m);
+
+(* The protocol *)
+(* A *)
+c:pk(x) -> c:pencrypt(n1[pk(x)], pk(x));
+c:pk(x) -> c:pencrypt(n2[pk(x)], pk(x));
+
+c:pencrypt(n1[pk(sA[])], pk(sA[])) &
+    c:pencrypt(n2[pk(sA[])], pk(sA[])) -> c:secret[];
+
+
+(* B *)
+c:pencrypt(n1[pk(sA[])], pk(sB[])) -> c:pencrypt(n1[pk(sA[])], pk(sA[]));
+c:pencrypt(n2[pk(sA[])], pk(sB[])) -> c:pencrypt(n2[pk(sA[])], pk(sA[])).
+\end{verbatim}
+\subsubsection{Proverif Output}
+\label{sec:orgf1d3299}
+\begin{verbatim}
+$ proverif false-error-protocol.horn
+Initial clauses:
+Clause 12: c:c[]
+Clause 11: c:pk(sA[])
+Clause 10: c:pk(sB[])
+Clause 9: c:x -> c:pk(x)
+Clause 8: c:x & c:pencrypt(m,pk(x)) -> c:m
+Clause 7: c:x & c:m -> c:pencrypt(x,m)
+Clause 6: c:pk(x) -> c:pencrypt(n1[pk(x)],pk(x))
+Clause 5: c:pk(x) -> c:pencrypt(n2[pk(x)],pk(x))
+Clause 4: c:pencrypt(n1[pk(sA[])],pk(sA[])) &
+              c:pencrypt(n2[pk(sA[])],pk(sA[])) -> c:secret[]
+Clause 3: c:pencrypt(n1[pk(sA[])],pk(sB[])) -> c:pencrypt(n1[pk(sA[])],pk(sA[]))
+Clause 2: c:pencrypt(n2[pk(sA[])],pk(sB[])) -> c:pencrypt(n2[pk(sA[])],pk(sA[]))
+Clause 1: c:new-name[!att = v]
+Completing...
+goal reachable: c:secret[]
+
+Derivation:
+Abbreviations:
+n1_1 = n1[pk(sA[])]
+n2_1 = n2[pk(sA[])]
+clause 4 c:secret[]
+    clause 6 c:pencrypt(n1_1,pk(sA[]))
+        duplicate c:pk(sA[])
+    clause 5 c:pencrypt(n2_1,pk(sA[]))
+        clause 11 c:pk(sA[])
+
+RESULT goal reachable: c:secret[]
+\end{verbatim}
+\subsubsection{Risultati}
+\label{sec:org526b6a7}
+Il protocollo proposto mostra un semplice ma efficace esempio di come un sistema di \emph{over-approximation} come \emph{proverif} può portare a dei \emph{false alarms}.
+In particolare il protocollo non è in alcun modo utilizzabile in quanto esso arriva a conclusione solo nel caso in cui \emph{Alice} abbia ricevuto da \emph{Bob} entrambi i \emph{Nonces} cifrati.
+Ciò però non è possibile in quanto il protocollo definisce l'invio di un unico \emph{Nonce} da parte di \emph{Bob}, pertanto \emph{Alice} non potrà mai riceverli entrambi.
+Il \emph{false-alarm} è dato dal fatto che in \emph{proverif} non può essere definito l'invio di un messaggio una sola volta, infatti, il \emph{secret[]}, ovvero il caso in cui \emph{Alice} abbia ricevuto entrambi i \emph{Nonces} è raggiungibile in quanto la \emph{over-approximation} aggiunge path inesistenti nella definizione reale del problema come appunto l'invio ripetuto di messaggi unici.
 \end{document}
